@@ -1,0 +1,6 @@
+projectKey=healthtrack
+serverUrl=http://localhost:9000
+serverVersion=25.6.0.109173
+dashboardUrl=http://localhost:9000/dashboard?id=healthtrack
+ceTaskId=0d755508-0370-4045-9651-f370a00967a2
+ceTaskUrl=http://localhost:9000/api/ce/task?id=0d755508-0370-4045-9651-f370a00967a2
