@@ -20,7 +20,12 @@ public class SeleniumPesoTest {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--remote-allow-origins=*");
 
+        // ✅ Evita conflictos de sesiones paralelas en Linux/CI
+        String profilePath = "/tmp/chrome-profile-" + System.currentTimeMillis();
+        options.addArguments("--user-data-dir=" + profilePath);
+
         driver = new ChromeDriver(options);
+
 
 
     }
