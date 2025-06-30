@@ -28,16 +28,21 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      # ✅ Instalar ChromeDriver compatible
+      # ✅ Instalar ChromeDriver
       - name: Instalar ChromeDriver
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
           MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d '.' -f 1)
-          DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
-          wget -q "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
+          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
+          
+          echo "Instalando ChromeDriver $DRIVER_VERSION para Chrome $CHROME_VERSION..."
+          
+          wget -O chromedriver.zip "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+          unzip chromedriver.zip
+          sudo mv chromedriver /usr/local/bin/chromedriver
           sudo chmod +x /usr/local/bin/chromedriver
+      
+      
 
       # 🔁 Acá ejecutás tus tests, incluyendo los de Selenium
       - name: Compilar y ejecutar pruebas
