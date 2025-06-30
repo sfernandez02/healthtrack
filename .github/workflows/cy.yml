@@ -20,33 +20,31 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # ✅ Instalar Google Chrome
-      - name: Instalar Google Chrome
+      # ✅ Instalar Google Chrome y ChromeDriver compatibles
+      - name: Instalar Google Chrome + ChromeDriver
         run: |
           sudo apt update
           sudo apt install -y wget unzip
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      # ✅ Instalar ChromeDriver
-      - name: Instalar ChromeDriver
-        run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
-          MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d '.' -f 1)
-          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
-          
-          echo "Instalando ChromeDriver $DRIVER_VERSION para Chrome $CHROME_VERSION..."
-          
-          wget -O chromedriver.zip "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+          # Instalar Chrome 117.0.5938.92
+          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_117.0.5938.92-1_amd64.deb
+          sudo apt install -y ./google-chrome-stable_117.0.5938.92-1_amd64.deb
+
+          # Crear symlink por compatibilidad
+          if [ ! -f /usr/bin/google-chrome ]; then
+            sudo ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome
+          fi
+
+          # Instalar ChromeDriver v117.0.5938.92
+          wget -O chromedriver.zip https://chromedriver.storage.googleapis.com/117.0.5938.92/chromedriver_linux64.zip
           unzip chromedriver.zip
           sudo mv chromedriver /usr/local/bin/chromedriver
           sudo chmod +x /usr/local/bin/chromedriver
-      
-      
 
-      # 🔁 Acá ejecutás tus tests, incluyendo los de Selenium
+      # 🔁 Compilar y ejecutar todas las pruebas (incluye Selenium)
       - name: Compilar y ejecutar pruebas
         run: mvn clean test
 
+      # 📊 Generar reporte de cobertura
       - name: Generar reporte de cobertura
         run: mvn verify
