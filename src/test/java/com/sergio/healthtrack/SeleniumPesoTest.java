@@ -19,11 +19,8 @@ public class SeleniumPesoTest {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
         options.addArguments("--remote-allow-origins=*");
-
         driver = new ChromeDriver(options);
-
     }
-
 
     @Test
     void buscarPesoSaludableEnGoogle() throws InterruptedException {
@@ -33,7 +30,7 @@ public class SeleniumPesoTest {
         inputBusqueda.sendKeys("peso saludable");
         inputBusqueda.submit();
 
-        Thread.sleep(2000); // Esperamos carga de resultados
+        Thread.sleep(2000);
 
         String titulo = driver.getTitle();
         assertTrue(titulo.toLowerCase().contains("peso saludable"));

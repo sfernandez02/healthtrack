@@ -20,7 +20,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # ✅ Instalar Google Chrome desde repositorio oficial
       - name: Instalar Google Chrome
         run: |
           sudo apt update
@@ -30,7 +29,6 @@ jobs:
           sudo apt update
           sudo apt install -y google-chrome-stable
 
-      # ✅ Instalar ChromeDriver que coincida con la versión de Chrome
       - name: Instalar ChromeDriver compatible
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
@@ -44,10 +42,8 @@ jobs:
           sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-      # 🔧 Ejecutar pruebas (unitarias + funcionales)
       - name: Compilar y ejecutar pruebas
         run: mvn clean test
 
-      # 📊 Generar reporte de cobertura (opcional)
       - name: Generar reporte de cobertura
         run: mvn verify
