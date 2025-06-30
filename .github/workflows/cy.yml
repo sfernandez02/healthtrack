@@ -20,31 +20,34 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # ✅ Instalar Google Chrome y ChromeDriver compatibles
-      - name: Instalar Google Chrome + ChromeDriver
+      # ✅ Instalar Google Chrome desde repositorio oficial
+      - name: Instalar Google Chrome
         run: |
           sudo apt update
-          sudo apt install -y wget unzip
+          sudo apt install -y wget unzip gnupg
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+          echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt update
+          sudo apt install -y google-chrome-stable
 
-          # Instalar Chrome 117.0.5938.92
-          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_117.0.5938.92-1_amd64.deb
-          sudo apt install -y ./google-chrome-stable_117.0.5938.92-1_amd64.deb
+      # ✅ Instalar ChromeDriver que coincida con la versión de Chrome
+      - name: Instalar ChromeDriver compatible
+        run: |
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
+          MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d '.' -f 1)
+          DRIVER_VERSION=$(curl -sS "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${MAJOR_VERSION}")
+          DRIVER_URL="https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${DRIVER_VERSION}/linux64/chromedriver-linux64.zip"
 
-          # Crear symlink por compatibilidad
-          if [ ! -f /usr/bin/google-chrome ]; then
-            sudo ln -s /opt/google/chrome/google-chrome /usr/bin/google-chrome
-          fi
-
-          # Instalar ChromeDriver v117.0.5938.92
-          wget -O chromedriver.zip https://chromedriver.storage.googleapis.com/117.0.5938.92/chromedriver_linux64.zip
+          echo "Instalando ChromeDriver ${DRIVER_VERSION} para Chrome ${CHROME_VERSION}"
+          wget -O chromedriver.zip "$DRIVER_URL"
           unzip chromedriver.zip
-          sudo mv chromedriver /usr/local/bin/chromedriver
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-      # 🔁 Compilar y ejecutar todas las pruebas (incluye Selenium)
+      # 🔧 Ejecutar pruebas (unitarias + funcionales)
       - name: Compilar y ejecutar pruebas
         run: mvn clean test
 
-      # 📊 Generar reporte de cobertura
+      # 📊 Generar reporte de cobertura (opcional)
       - name: Generar reporte de cobertura
         run: mvn verify
